@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+    <script src="{% static 'bootstrap.min.css' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div class="mt-4 p-4">
+      <div class="chatbox-start card shadow p-4">
+        <div class="row">
+          <h5 class="text-center">Chat</h5>
+        </div>
+        <hr />
+        <div id="ChatBox"></div>
+        <hr />
+        <div class="row mt-4 cust p-4">
+          <div class="col-9 col-lg-10 m-auto">
+            <input class="form-control" type="text" id="SendInput" />
+          </div>
+          <div class="col-3 col-lg-2 m-auto">
+            <button class="btn btn-primary" onclick="RequestedText()">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </body>
+    <script>
+    function RequestedText() {
+      var ReqText = $('#SendInput').val()
+      var AppendedText = '<p class="UserText shadow p-2 mt-2">' + ReqText + '</p>'
+      var ChatBoxText = $('#ChatBox').append(AppendedText)
+      document.getElementById('SendInput').value = ''
+
+      $.get("{% url 'landing:ChattingRequest' %}", { ReqText: ReqText }).done(function (data) {
+        var AppendedText = '<p class="BotText shadow p-2 mt-2" >' + data + '</p>'
+        var ChatBoxText = $('#ChatBox').append(AppendedText)
+
+        setTimeout(function () {
+          var d = $('#ChatBox')
+          d.scrollTop(d[0].scrollHeight)
+        }, 1)
+      })
+      setTimeout(function () {
+        var d = $('#ChatBox')
+        d.scrollTop(d[0].scrollHeight)
+      }, 1)
+    }
+  </script>

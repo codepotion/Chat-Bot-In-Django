@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+    <script src="{% static 'bootstrap.min.css' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div class="mt-4 p-4">
+      <div class="chatbox-start card shadow p-4">
+        <div class="row">
+          <h5 class="text-center text-light">Chat</h5>
+        </div>
+        <hr />
+        <div id="ChatBox"></div>
+        <hr />
+        <div class="row mt-4 cust p-4">
+          <div class="col-9 col-lg-10 m-auto">
+            <input class="form-control" type="text" id="SendInput" />
+          </div>
+          <div class="col-3 col-lg-2 m-auto">
+            <button class="btn btn-primary" onclick="RequestedText()">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    var ws = new WebSocket('ws://127.0.0.1:8000/ws/sc/')
+    
+    function ScrollToBottom() {
+      setTimeout(function () {
+        var d = $('#ChatBox')
+        d.scrollTop(d[0].scrollHeight)
+      }, 1)
+    }
+    
+    ws.onopen = function () {
+      var AppendedText = '<span class="chat-text shadow p-2 mt-2" >Bot: Connected</span>'
+      var ChatBoxText = $('#ChatBox').append(AppendedText)
+      ScrollToBottom()
+    }
+    
+    function RequestedText() {
+      var ReqText = $('#SendInput').val()
+      var AppendedText = '<span class="chat-text shadow p-2 mt-2">You: ' + ReqText + '</span>'
+      var ChatBoxText = $('#ChatBox').append(AppendedText)
+      document.getElementById('SendInput').value = ''
+      ws.send(ReqText)
+      ScrollToBottom()
+    }
+    
+    ws.onmessage = function (event) {
+      var AppendedText = '<span class="chat-text shadow p-2 mt-2" >Bot:' + event['data'] + '</span>'
+      var ChatBoxText = $('#ChatBox').append(AppendedText)
+      ScrollToBottom()
+    }
+    
+    ws.onerror = function (event) {
+      var AppendedText = '<span class="chat-text shadow p-2 mt-2" >Bot: Something went wrong</span>'
+      var ChatBoxText = $('#ChatBox').append(AppendedText)
+      ScrollToBottom()
+    }
+    
+    ws.onclose = function (event) {
+      var AppendedText = '<span class="chat-text shadow p-2 mt-2" >Bot: Disconnected, Refresh to connect.</span>'
+      var ChatBoxText = $('#ChatBox').append(AppendedText)
+      ScrollToBottom()
+    }
+    
+    // ws.addEventListener('open', () => {
+    //  console.log('open')
+    //})
+  </script>
+</html>
